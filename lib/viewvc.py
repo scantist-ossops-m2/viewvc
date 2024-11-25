@@ -957,7 +957,7 @@ def nav_path(request):
     path_parts.append(part)
     is_last = len(path_parts) == len(request.path_parts)
 
-    item = _item(name=part, href=None)
+    item = _item(name=request.server.escape(part), href=None)
 
     if not is_last or (is_dir and request.view_func is not view_directory):
       item.href = request.get_url(view_func=view_directory,
@@ -2113,7 +2113,7 @@ def view_directory(request):
       if request.roottype == 'cvs' and file.rev is not None:
         row.rev = None
         if cfg.options.show_logs:
-          row.log_file = file.newest_file
+          row.log_file = request.server.escape(file.newest_file)
           row.log_rev = file.rev
 
       if request.roottype == 'svn':
@@ -3674,8 +3674,8 @@ def view_revision(request):
     
 
     # use same variable names as the log template
-    change.path = _path_join(change.path_parts)
-    change.copy_path = _path_join(change.base_path_parts)
+    change.path = request.server.escape(path)
+    change.copy_path = request.server.escape(_path_join(change.base_path_parts))
     change.copy_rev = change.base_rev
     change.text_mods = ezt.boolean(change.text_changed)
     change.prop_mods = ezt.boolean(change.props_changed)
